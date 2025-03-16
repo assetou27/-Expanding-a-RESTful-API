@@ -1,89 +1,69 @@
-const express = require("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-const comments = require("../data/comments")
+const comments = require("../data/comments");
 
 router
-    .route("/")
-    .get((req, res) => {
-        // this is how we know this is a query parameter
-        const {userId, postId} = req.query
-        let filteredComments = comments
-        if(userId) {
-            filteredComments = filteredComments.filter(comment  => comment.userId == userId)
-        }
-        if (postId) {
-            filteredComments = filteredComments.filter(comment => comment.postId == postId)
-        }
-        res.json(filteredComments)
-    })
-    .post((req, res) => {
-        if(req.body.userId && req.body.postId && req.body.body){
-        const newComment = {
-            id: Number(comments[comments.length - 1].id) + 1,
-            userId: req.body.userId,
-            postId: req.body.postId,
-            body: req.body.body
-        }
-        comments.push(newComment)
-        res.json(newComment)
+  .route("/")
+  .get((req, res) => {
+    const { userId, postId } = req.query;
+    let filterComments = comments;
+    if (userId) {
+      filterComments = filterComments.filter(
+        (comment) => comment.userId == userId
+      );
     }
-        else res.json({ error: "insufficent data" })
-
-        })
-
+    if (postId) {
+      filterComments = filterComments.filter(
+        (comments) => comments.postId == postId
+      );
+    }
+    res.json(filterComments);
+  })
+  .post((req, res) => {
+    if (req.body.userId && req.body.postId && req.body.body) {
+      const newComment = {
+        id: Number(comments[comments.length - 1].id) + 1,
+        userId: req.body.userId,
+        postId: req.body.postId,
+        body: req.body.body,
+      };
+      comments.push(newComment);
+      res.json(newComment);
+    } else res.json({ error: "Insufficient Data" });
+  });
 router
-    .route("/:commentID")
-    .get((req, res) => {
-        const comment = comments.find(comment => comment.id === req.params.commentID)
-        res.json(comment)
-    }) 
-    .patch((req, res) => {
-        const comment = comments.find((comment, i)=> {
-        if(comment.id == req.params.commentID){
-            for(const key in req.body){
-                comments[i][key]=req.body[key]
-            }
-            return true
-        }
-    })
-    if (comment) res.json(comment)
-        else{res.status(404).send("Comment not found")}
-})
-.delete((req, res) => {
+  .route("/:commentID")
+  .get((req, res) => {
+    const comment = comments.find(
+      (comment) => comment.id === req.params.commentID
+    );
+    res.json(comment);
+  })
+  .patch((req, res) => {
     const comment = comments.find((comment, i) => {
-        if(comment.id == req.params.commentID){
-            comments.splice(i, 1)
-            return true
+      if (comment.id == req.params.commentID) {
+        for (const key in req.body) {
+          comments[i][key] = req.body[key];
         }
-    })
-    if(comment) res.json(comment)
-        else {res.status(404).send("Comment not found")}
-})
-//     if (req.body.userId && req.body.content) {
-//         const comment = {
-//             id: comments[comments.length - 1].id + 1,
-//             userId: req.body.userId,
-//             content: req.body.content
-//         }
-//         comments.push(comment)
-//         res.json(comments[comments.length - 1])
-//     } else res.json({ error: "Insufficient Data" })
-// })
-// .patch((req, res) => {
-//     const comment = comments.find((comment, i) => {
-//         if (comment.id == req.params.commentsID) {
-//             for (const key in req.body) {
-//                 comments[i][key] = req.body[key]
-//             }
-//             return true
-//         }
-// })
-// if (comment) res.json(comment)
-//     else { res.status(404).send("Comment not found") }
-// })
-// .delete((req, res) => {
-
-// })
-
-module.exports = router
+        return true;
+      }
+    });
+    if (comment) res.json(comment);
+    else {
+      res.status(404).send("Comment not found");
+    }
+  })
+  .delete((req, res) => {
+    const comment = comments.find((comment, i) => {
+      if (comment.id == req.params.commentID) {
+        comments.splice(i, 1);
+        return true;
+      }
+    });
+    if (comment) res.json(comment);
+    else {
+      res.status(404).send("Comment not found");
+    }
+  });
+module.exports = router;
